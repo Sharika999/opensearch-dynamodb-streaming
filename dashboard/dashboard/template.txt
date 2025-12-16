@@ -4,40 +4,28 @@ dynamodb-pipeline:
     dynamodb:
       acknowledgments: true
       tables:
-        # REQUIRED: Supply the DynamoDB table ARN and whether export or stream processing is needed, or both
-        - table_arn: "DYNAMODB_TABLE_ARN"
-          # Remove the stream block if only export is needed
+        - table_arn: "DYNAMODB_TABLE_ARN"   # Will be replaced dynamically by CDK
           stream:
             start_position: "LATEST"
-          # Remove the export block if only stream is needed
           export:
-            # REQUIRED for export: Specify the name of an existing S3 bucket for DynamoDB to write export data files to
-            s3_bucket: "BUCKET_NAME"
-            # Specify the region of the S3 bucket
-            s3_region: "REGION_NAME"
-            # Optionally set the name of a prefix that DynamoDB export data files are written to in the bucket.
-            s3_prefix: "ddb-to-opensearch-export/"
+            s3_bucket: "BUCKET_NAME"       # Will be replaced dynamically by CDK
+            s3_region: "REGION_NAME"       # Will be replaced dynamically by CDK
+            s3_prefix: "opensearch-ddb-export/"
       aws:
-        # REQUIRED: Provide the role to assume that has the necessary permissions to DynamoDB, OpenSearch, and S3.
-        sts_role_arn: "STS_ROLE_ARN"
-        # Provide the region to use for aws credentials
-        region: "REGION_NAME"
+        sts_role_arn: "STS_ROLE_ARN"       # Will be replaced dynamically by CDK
+        region: "REGION_NAME"              # Will be replaced dynamically by CDK
   sink:
     - opensearch:
-        # REQUIRED: Provide an AWS OpenSearch endpoint
         hosts:
           [
-            "https://OpenSearch_DOMAIN"
+            "https://OpenSearch_DOMAIN"  # Will be replaced dynamically by CDK
           ]
-        index: "table-index"
+        index: "opensearch-ddb-index"
         index_type: custom
         document_id: "${getMetadata(\"primary_key\")}"
         action: "${getMetadata(\"opensearch_action\")}"
         document_version: "${getMetadata(\"document_version\")}"
         document_version_type: "external"
         aws:
-          # REQUIRED: Provide a Role ARN with access to the domain. This role should have a trust relationship with osis-pipelines.amazonaws.com
-          sts_role_arn: "STS_ROLE_ARN"
-          # Provide the region of the domain.
+          sts_role_arn: "STS_ROLE_ARN"   # Will be replaced dynamically by CDK
           region: "REGION_NAME"
-         
